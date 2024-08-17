@@ -3,11 +3,12 @@ package ar.edu.utn.frbb.tup.persistence;
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.persistence.entity.ClienteEntity;
+import ar.edu.utn.frbb.tup.persistence.persistanceInterface.ClienteDaoInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ClienteDao extends AbstractBaseDao{
+public class ClienteDao extends AbstractBaseDao implements ClienteDaoInterface {
 
     @Autowired
     CuentaDao cuentaDao;
@@ -15,7 +16,7 @@ public class ClienteDao extends AbstractBaseDao{
     public Cliente find(long dni, boolean loadComplete) {
         if (getInMemoryDatabase().get(dni) == null)
             return null;
-        Cliente cliente =   ((ClienteEntity) getInMemoryDatabase().get(dni)).toCliente();
+        Cliente cliente = ((ClienteEntity) getInMemoryDatabase().get(dni)).toCliente();
         if (loadComplete) {
             for (Cuenta cuenta :
                     cuentaDao.getCuentasByCliente(dni)) {
@@ -23,7 +24,6 @@ public class ClienteDao extends AbstractBaseDao{
             }
         }
         return cliente;
-
     }
 
     public void save(Cliente cliente) {
@@ -31,8 +31,13 @@ public class ClienteDao extends AbstractBaseDao{
         getInMemoryDatabase().put(entity.getId(), entity);
     }
 
+    public void delete(Cliente cliente) {
+        getInMemoryDatabase().remove(cliente.getDni());
+    }
+
     @Override
     protected String getEntityName() {
         return "CLIENTE";
     }
+
 }

@@ -1,30 +1,44 @@
 package ar.edu.utn.frbb.tup.model;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
+
+import ar.edu.utn.frbb.tup.controller.dto.CuentaDto;
+import ar.edu.utn.frbb.tup.model.exception.TipoCuentaNotSupportedException;
 
 public class Cuenta {
     private long numeroCuenta;
     LocalDateTime fechaCreacion;
-    int balance;
+    double balance;
     TipoCuenta tipoCuenta;
-    Cliente titular;
+    long titular;
     TipoMoneda moneda;
+    private Set<Movimiento> movimientos = new HashSet<>();
 
     public Cuenta() {
-        this.numeroCuenta = new Random().nextLong();
+        this.numeroCuenta = Math.abs(new Random().nextLong());
         this.balance = 0;
         this.fechaCreacion = LocalDateTime.now();
     }
 
-    public Cliente getTitular() {
+    public Cuenta(CuentaDto cuentaDto){
+        this.tipoCuenta = TipoCuenta.fromString(cuentaDto.getTipoCuenta());
+        this.moneda = TipoMoneda.fromString(cuentaDto.getMoneda());
+        this.fechaCreacion = LocalDateTime.now();
+        this.balance = 0;
+        this.numeroCuenta = Math.abs(new Random().nextLong());
+    }
+
+    public long getTitular() {
         return titular;
     }
 
-    public void setTitular(Cliente titular) {
+    public void setTitular(long titular) {
         this.titular = titular;
     }
-
 
     public TipoCuenta getTipoCuenta() {
         return tipoCuenta;
@@ -44,7 +58,6 @@ public class Cuenta {
         return this;
     }
 
-
     public LocalDateTime getFechaCreacion() {
         return fechaCreacion;
     }
@@ -54,22 +67,22 @@ public class Cuenta {
         return this;
     }
 
-    public int getBalance() {
+    public double getBalance() {
         return balance;
     }
 
-    public Cuenta setBalance(int balance) {
+    public Cuenta setBalance(double balance) {
         this.balance = balance;
         return this;
     }
 
-    public void debitarDeCuenta(int cantidadADebitar) throws NoAlcanzaException, CantidadNegativaException {
+    public void debitarDeCuenta(int cantidadADebitar) throws TipoCuentaNotSupportedException.NoAlcanzaException, TipoCuentaNotSupportedException.CantidadNegativaException {
         if (cantidadADebitar < 0) {
-            throw new CantidadNegativaException();
+            throw new TipoCuentaNotSupportedException.CantidadNegativaException();
         }
 
         if (balance < cantidadADebitar) {
-            throw new NoAlcanzaException();
+            throw new TipoCuentaNotSupportedException.NoAlcanzaException();
         }
         this.balance = this.balance - cantidadADebitar;
     }
@@ -86,5 +99,13 @@ public class Cuenta {
         return numeroCuenta;
     }
 
+    public Set<Movimiento> getMovimientos() {
+        return movimientos;
+    }
+
+    public void addMovimiento(Movimiento movimiento) {
+        this.movimientos.add(movimiento);
+        movimiento.setNumeroCuenta(this.getNumeroCuenta());
+    }
 
 }

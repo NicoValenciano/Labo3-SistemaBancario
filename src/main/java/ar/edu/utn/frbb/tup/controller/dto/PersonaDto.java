@@ -1,4 +1,4 @@
-package ar.edu.utn.frbb.tup.controller;
+package ar.edu.utn.frbb.tup.controller.dto;
 
 public class PersonaDto {
     private String nombre;
@@ -22,7 +22,7 @@ public class PersonaDto {
         this.apellido = apellido;
     }
 
-    public long getDni() {
+    public Long getDni() {
         return dni;
     }
 

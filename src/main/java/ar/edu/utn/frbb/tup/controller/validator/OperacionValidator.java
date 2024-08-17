@@ -3,8 +3,15 @@ package ar.edu.utn.frbb.tup.controller.validator;
 import ar.edu.utn.frbb.tup.controller.dto.MovimientoDto;
 import ar.edu.utn.frbb.tup.model.exception.TipoMonedaIncompatibleException;
 
-public class MovimientoValidator {
-    public void validate(MovimientoDto movimientoDto) throws TipoMonedaIncompatibleException {
+public class OperacionValidator {
+
+    public void validateIdCuenta(long idCuenta) {
+        if (idCuenta <= 0) {
+            throw new IllegalArgumentException("El id de la cuenta debe ser mayor a 0");
+        }
+    }
+
+    public void validateOperacion(MovimientoDto movimientoDto) throws TipoMonedaIncompatibleException {
         double monto =  0.0;
         monto += movimientoDto.getMonto();
 

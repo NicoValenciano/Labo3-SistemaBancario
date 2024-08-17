@@ -1,14 +1,13 @@
-package ar.edu.utn.frbb.tup.controller;
-
-import ar.edu.utn.frbb.tup.model.TipoMovimiento;
+package ar.edu.utn.frbb.tup.controller.dto;
 
 public class MovimientoDto {
     private long cuentaOrigen;
     private long cuentaDestino;
     private double monto;
     private String moneda;
+    private String tipoMovimiento;
 
-    public long getIdCuentaOrigen() {
+    public long getCuentaOrigen() {
         return cuentaOrigen;
     }
 
@@ -24,7 +23,7 @@ public class MovimientoDto {
         this.cuentaDestino = cuentaDestino;
     }
 
-    public double getMonto() {
+    public Double getMonto() {
         return monto;
     }
 
@@ -39,4 +38,7 @@ public class MovimientoDto {
     public void setMoneda(String moneda) {
         this.moneda = moneda;
     }
+
+    public String getTipoMovimiento() { return tipoMovimiento;}
+
 }

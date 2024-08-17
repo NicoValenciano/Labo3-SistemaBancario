@@ -1,17 +1,15 @@
 package ar.edu.utn.frbb.tup.controller;
 
+import ar.edu.utn.frbb.tup.controller.dto.ClienteDto;
 import ar.edu.utn.frbb.tup.controller.validator.ClienteValidator;
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.exception.ClienteAlreadyExistsException;
 import ar.edu.utn.frbb.tup.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/cliente")
+@RequestMapping("/api/cliente")
 public class ClienteController {
 
     @Autowired
@@ -26,4 +24,21 @@ public class ClienteController {
         clienteValidator.validate(clienteDto);
         return clienteService.darDeAltaCliente(clienteDto);
     }
+
+    @GetMapping("/{dni}")
+    public Cliente buscarClientePorDni(@PathVariable long dni) {
+        return clienteService.buscarClientePorDni(dni);
+    }
+
+   @PutMapping("/{dni}")
+    public Cliente modificarCliente(@RequestBody ClienteDto clienteDto, @PathVariable long dni) throws ClienteAlreadyExistsException {
+        clienteValidator.validate(clienteDto);
+        return clienteService.modificarCliente(clienteDto, dni);
+    }
+
+    @DeleteMapping("/{dni}")
+    public void eliminarCliente(@PathVariable long dni) {
+        clienteService.eliminarCliente(dni);
+    }
+
 }

@@ -1,9 +1,9 @@
-package ar.edu.utn.frbb.tup.controller;
+package ar.edu.utn.frbb.tup.controller.dto;
 
 public class CuentaDto {
 
     private String tipoCuenta;
-    private long dniTitular;
+    private Long dniTitular;
     private String moneda;
 
 
@@ -15,13 +15,14 @@ public class CuentaDto {
         this.tipoCuenta = tipoCuenta;
     }
 
-    public long getdniTitular() {
+    public Long getdniTitular() {
         return dniTitular;
     }
 
     public void setDniTitular(long dniTitular) {
         this.dniTitular = dniTitular;
     }
+
     public String getMoneda() {
         return moneda;
     }

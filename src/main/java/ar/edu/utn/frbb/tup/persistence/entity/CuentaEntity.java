@@ -1,43 +1,37 @@
 package ar.edu.utn.frbb.tup.persistence.entity;
 
-import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.TipoCuenta;
-import ar.edu.utn.frbb.tup.persistence.ClienteDao;
+import ar.edu.utn.frbb.tup.model.TipoMoneda;
 
 import java.time.LocalDateTime;
 
 public class CuentaEntity extends BaseEntity{
-    String nombre;
     LocalDateTime fechaCreacion;
-    int balance;
+    double balance;
     String tipoCuenta;
     Long titular;
     long numeroCuenta;
+    String moneda;
 
     public CuentaEntity(Cuenta cuenta) {
         super(cuenta.getNumeroCuenta());
         this.balance = cuenta.getBalance();
         this.tipoCuenta = cuenta.getTipoCuenta().toString();
-        this.titular = cuenta.getTitular().getDni();
+        this.titular = cuenta.getTitular();
         this.fechaCreacion = cuenta.getFechaCreacion();
+        this.moneda = String.valueOf(cuenta.getMoneda());
     }
 
     public Cuenta toCuenta() {
         Cuenta cuenta = new Cuenta();
         cuenta.setBalance(this.balance);
-        cuenta.setNumeroCuenta(this.numeroCuenta);
+        cuenta.setNumeroCuenta(this.getId());
         cuenta.setTipoCuenta(TipoCuenta.valueOf(this.tipoCuenta));
         cuenta.setFechaCreacion(this.fechaCreacion);
+        cuenta.setMoneda(TipoMoneda.valueOf(this.moneda));
+        cuenta.setTitular(this.titular);
         return cuenta;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
     }
 
     public LocalDateTime getFechaCreacion() {
@@ -48,7 +42,7 @@ public class CuentaEntity extends BaseEntity{
         this.fechaCreacion = fechaCreacion;
     }
 
-    public int getBalance() {
+    public double getBalance() {
         return balance;
     }
 

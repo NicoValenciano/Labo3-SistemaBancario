@@ -1,18 +1,16 @@
 package ar.edu.utn.frbb.tup.model;
 
-import ar.edu.utn.frbb.tup.controller.ClienteDto;
+import ar.edu.utn.frbb.tup.controller.dto.ClienteDto;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class Cliente extends Persona{
 
     private TipoPersona tipoPersona;
     private String banco;
-    private LocalDate fechaAlta;
+    private LocalDateTime fechaAlta;
     private Set<Cuenta> cuentas = new HashSet<>();
 
     public Cliente() {
@@ -20,7 +18,8 @@ public class Cliente extends Persona{
     }
     public Cliente(ClienteDto clienteDto) {
         super(clienteDto.getDni(), clienteDto.getApellido(), clienteDto.getNombre(), clienteDto.getFechaNacimiento());
-        fechaAlta = LocalDate.now();
+        this.tipoPersona = TipoPersona.fromString(clienteDto.getTipoPersona());
+        fechaAlta = LocalDateTime.now();
         banco = clienteDto.getBanco();
     }
 
@@ -40,11 +39,11 @@ public class Cliente extends Persona{
         this.banco = banco;
     }
 
-    public LocalDate getFechaAlta() {
+    public LocalDateTime getFechaAlta() {
         return fechaAlta;
     }
 
-    public void setFechaAlta(LocalDate fechaAlta) {
+    public void setFechaAlta(LocalDateTime fechaAlta) {
         this.fechaAlta = fechaAlta;
     }
 
@@ -54,7 +53,7 @@ public class Cliente extends Persona{
 
     public void addCuenta(Cuenta cuenta) {
         this.cuentas.add(cuenta);
-        cuenta.setTitular(this);
+        cuenta.setTitular(this.getDni());
     }
 
     public boolean tieneCuenta(TipoCuenta tipoCuenta, TipoMoneda moneda) {
@@ -67,7 +66,7 @@ public class Cliente extends Persona{
         return false;
     }
 
-    @Override
+/*    @Override
     public String toString() {
         return "Cliente{" +
                 "tipoPersona=" + tipoPersona +
@@ -75,5 +74,5 @@ public class Cliente extends Persona{
                 ", fechaAlta=" + fechaAlta +
                 ", cuentas=" + cuentas +
                 '}';
-    }
+    }*/
 }

@@ -1,17 +1,16 @@
 package ar.edu.utn.frbb.tup.controller;
 
-public class MovimientoRespuesta {
+public class OperacionRespuesta {
 
-        private String estado;
-        private String mensaje;
+    private String estado;
+    private String mensaje;
 
-        public MovimientoRespuesta(String estado, String mensaje) {
-            this.estado = estado;
-            this.mensaje = mensaje;
-        }
+    public OperacionRespuesta(String estado, String mensaje) {
+        this.estado = estado;
+        this.mensaje = mensaje;
+    }
 
-    public MovimientoRespuesta() {
-
+    public OperacionRespuesta() {
     }
 
     public String getEstado() {

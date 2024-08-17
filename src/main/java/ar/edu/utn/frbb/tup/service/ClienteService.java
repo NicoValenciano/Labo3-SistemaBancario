@@ -1,19 +1,23 @@
 package ar.edu.utn.frbb.tup.service;
 
-import ar.edu.utn.frbb.tup.controller.ClienteDto;
+import ar.edu.utn.frbb.tup.controller.dto.ClienteDto;
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
+import ar.edu.utn.frbb.tup.model.TipoPersona;
 import ar.edu.utn.frbb.tup.model.exception.ClienteAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.persistence.ClienteDao;
-import org.springframework.stereotype.Service;
+import ar.edu.utn.frbb.tup.service.serviceInterface.ClienteServiceInterface;
+import org.springframework.stereotype.Component;
 
-@Service
-public class ClienteService {
+import java.time.LocalDate;
+
+@Component
+public class ClienteService implements ClienteServiceInterface {
 
     ClienteDao clienteDao;
 
-    public ClienteService(ClienteDao clienteDao) {
+    public void ClienteService(ClienteDao clienteDao) {
         this.clienteDao = clienteDao;
     }
 
@@ -34,7 +38,7 @@ public class ClienteService {
 
     public void agregarCuenta(Cuenta cuenta, long dniTitular) throws TipoCuentaAlreadyExistsException {
         Cliente titular = buscarClientePorDni(dniTitular);
-        cuenta.setTitular(titular);
+        cuenta.setTitular(dniTitular);
         if (titular.tieneCuenta(cuenta.getTipoCuenta(), cuenta.getMoneda())) {
             throw new TipoCuentaAlreadyExistsException("El cliente ya posee una cuenta de ese tipo y moneda");
         }
@@ -48,5 +52,21 @@ public class ClienteService {
             throw new IllegalArgumentException("El cliente no existe");
         }
         return cliente;
+    }
+
+    public Cliente modificarCliente(ClienteDto clienteDto, long dni) {
+        Cliente cliente = buscarClientePorDni(dni);
+        cliente.setNombre(clienteDto.getNombre());
+        cliente.setApellido(clienteDto.getApellido());
+        cliente.setDni(clienteDto.getDni());
+        cliente.setFechaNacimiento(LocalDate.parse(clienteDto.getFechaNacimiento()));
+        cliente.setTipoPersona(TipoPersona.valueOf(clienteDto.getTipoPersona()));
+        clienteDao.save(cliente);
+        return cliente;
+    }
+
+    public void eliminarCliente(long dni) {
+        Cliente cliente = buscarClientePorDni(dni);
+        clienteDao.delete(cliente);
     }
 }
