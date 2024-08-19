@@ -1,6 +1,8 @@
 package ar.edu.utn.frbb.tup.model;
 
 import ar.edu.utn.frbb.tup.controller.dto.ClienteDto;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -10,7 +12,9 @@ public class Cliente extends Persona{
 
     private TipoPersona tipoPersona;
     private String banco;
+    @JsonFormat(pattern="yyyy-MM-dd")
     private LocalDateTime fechaAlta;
+    @JsonIgnore
     private Set<Cuenta> cuentas = new HashSet<>();
 
     public Cliente() {
@@ -66,13 +70,4 @@ public class Cliente extends Persona{
         return false;
     }
 
-/*    @Override
-    public String toString() {
-        return "Cliente{" +
-                "tipoPersona=" + tipoPersona +
-                ", banco='" + banco + '\'' +
-                ", fechaAlta=" + fechaAlta +
-                ", cuentas=" + cuentas +
-                '}';
-    }*/
 }

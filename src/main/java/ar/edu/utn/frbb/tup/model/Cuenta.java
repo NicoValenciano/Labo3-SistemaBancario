@@ -8,14 +8,18 @@ import java.util.Set;
 
 import ar.edu.utn.frbb.tup.controller.dto.CuentaDto;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaNotSupportedException;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Cuenta {
     private long numeroCuenta;
+    @JsonFormat(pattern="yyyy-MM-dd")
     LocalDateTime fechaCreacion;
     double balance;
     TipoCuenta tipoCuenta;
     long titular;
     TipoMoneda moneda;
+    @JsonIgnore
     private Set<Movimiento> movimientos = new HashSet<>();
 
     public Cuenta() {
@@ -24,7 +28,7 @@ public class Cuenta {
         this.fechaCreacion = LocalDateTime.now();
     }
 
-    public Cuenta(CuentaDto cuentaDto){
+    public Cuenta(CuentaDto cuentaDto) throws TipoCuentaNotSupportedException {
         this.tipoCuenta = TipoCuenta.fromString(cuentaDto.getTipoCuenta());
         this.moneda = TipoMoneda.fromString(cuentaDto.getMoneda());
         this.fechaCreacion = LocalDateTime.now();
@@ -76,23 +80,8 @@ public class Cuenta {
         return this;
     }
 
-    public void debitarDeCuenta(int cantidadADebitar) throws TipoCuentaNotSupportedException.NoAlcanzaException, TipoCuentaNotSupportedException.CantidadNegativaException {
-        if (cantidadADebitar < 0) {
-            throw new TipoCuentaNotSupportedException.CantidadNegativaException();
-        }
-
-        if (balance < cantidadADebitar) {
-            throw new TipoCuentaNotSupportedException.NoAlcanzaException();
-        }
-        this.balance = this.balance - cantidadADebitar;
-    }
-
     public void setNumeroCuenta(long numeroCuenta) {
         this.numeroCuenta = numeroCuenta;
-    }
-
-    public void forzaDebitoDeCuenta(int i) {
-        this.balance = this.balance - i;
     }
 
     public long getNumeroCuenta() {

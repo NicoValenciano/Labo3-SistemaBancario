@@ -1,13 +1,14 @@
 package ar.edu.utn.frbb.tup.model;
-
 import ar.edu.utn.frbb.tup.controller.dto.MovimientoDto;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Random;
 
 public class Movimiento {
+    @JsonIgnore
     private long id;
+    @JsonFormat(pattern="yyyy-MM-dd")
     private LocalDateTime fecha;
     private TipoMovimiento tipo;
     private long numeroCuenta;
@@ -19,7 +20,6 @@ public class Movimiento {
         this.id = Math.abs(new Random().nextLong());
         this.fecha = LocalDateTime.now();
     }
-
     public Movimiento(MovimientoDto movimientoDto) {
         this.id = Math.abs(new Random().nextLong());
         this.fecha = LocalDateTime.now();
@@ -65,9 +65,11 @@ public class Movimiento {
     public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
+
     public String getDescripcionBreve() {
         return descripcionBreve;
     }
+
     public void setDescripcionBreve(String descripcionBreve) {
         this.descripcionBreve = descripcionBreve;
     }

@@ -9,9 +9,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(ClienteController.class)
 
-class ClienteControllerTest {
+public class ClienteControllerTest {
+
     @Autowired
-    private MockMvc mvc;
+    private MockMvc mockMvc;
 
     @MockBean
     private ClienteController clienteController;

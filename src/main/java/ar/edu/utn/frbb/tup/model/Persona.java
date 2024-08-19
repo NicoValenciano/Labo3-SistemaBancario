@@ -1,5 +1,7 @@
 package ar.edu.utn.frbb.tup.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDate;
 import java.time.Period;
 
@@ -7,6 +9,7 @@ public class Persona {
     private String nombre;
     private String apellido;
     private long dni;
+    @JsonFormat(pattern="yyyy-MM-dd")
     private LocalDate fechaNacimiento;
 
     public Persona() {}

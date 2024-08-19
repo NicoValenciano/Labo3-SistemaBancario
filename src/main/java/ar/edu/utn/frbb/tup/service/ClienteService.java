@@ -8,6 +8,7 @@ import ar.edu.utn.frbb.tup.model.exception.ClienteAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.persistence.ClienteDao;
 import ar.edu.utn.frbb.tup.service.serviceInterface.ClienteServiceInterface;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 @Component
 public class ClienteService implements ClienteServiceInterface {
 
+    @Autowired
     ClienteDao clienteDao;
 
     public void ClienteService(ClienteDao clienteDao) {

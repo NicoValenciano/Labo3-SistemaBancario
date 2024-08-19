@@ -2,6 +2,7 @@ package ar.edu.utn.frbb.tup.controller;
 
 
 import ar.edu.utn.frbb.tup.model.Movimiento;
+import ar.edu.utn.frbb.tup.model.exception.MovimientoNotExistsException;
 import ar.edu.utn.frbb.tup.service.MovimientoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +20,7 @@ public class MovimientoController {
     private MovimientoService movimientoService;
 
     @GetMapping("/{id}")
-    public Movimiento getMovimientoById(@PathVariable long id) {
+    public Movimiento getMovimientoById(@PathVariable long id) throws MovimientoNotExistsException {
         return movimientoService.find(id);
     }
 

@@ -11,7 +11,7 @@ public class MovimientoDto {
         return cuentaOrigen;
     }
 
-    public void setIdCuentaOrigen(long cuentaOrigen) {
+    public void setCuentaOrigen(long cuentaOrigen) {
         this.cuentaOrigen = cuentaOrigen;
     }
 
