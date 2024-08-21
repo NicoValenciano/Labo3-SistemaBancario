@@ -55,11 +55,11 @@ class MovimientoServiceTest {
     }
 
     @Test
-    void testFindExcepcion() {
+    void testFindExcepcion() throws MovimientoNotExistsException {
         long id = 123456789;
-        when(movimientoDao.find(id)).thenThrow(new RuntimeException("Error al buscar movimiento"));
+        when(movimientoDao.find(id)).thenReturn(null);
 
-        assertThrows(RuntimeException.class, () -> movimientoService.find(id));
+        assertThrows(MovimientoNotExistsException.class, () -> movimientoService.find(id));
         verify(movimientoDao, times(1)).find(id);
     }
 }

@@ -17,6 +17,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -63,8 +66,8 @@ public class CuentaServiceTest {
     @Test
     public void testTipoCuentaNoSoportada() throws TipoCuentaAlreadyExistsException {
         CuentaDto cuentaDto = new CuentaDto();
-        cuentaDto.setMoneda("PESOS");
-        cuentaDto.setTipoCuenta("TIPO_NO_SOPORTADO");
+        cuentaDto.setMoneda("DOLARES");
+        cuentaDto.setTipoCuenta("CUENTA_CORRIENTE");
 
         assertThrows(TipoCuentaNotSupportedException.class, () -> cuentaService.darDeAltaCuenta(cuentaDto));
         verify(cuentaDao, never()).save(any());
@@ -101,5 +104,49 @@ public class CuentaServiceTest {
         assertEquals("CAJA_AHORRO", cuenta.getTipoCuenta().toString());
         verify(cuentaDao, times(1)).save(cuenta);
         verify(clienteService, times(1)).agregarCuenta(cuenta, 123456789);
+    }
+
+    @Test
+    public void testCuentaFindById() {
+        Cuenta cuenta = new Cuenta();
+        when(cuentaDao.find(anyLong())).thenReturn(cuenta);
+        assertEquals(cuenta, cuentaDao.find(anyLong()));
+        verify(cuentaDao, times(1)).find(anyLong());
+    }
+
+    @Test
+    public void testCuentaDeleteByNumeroCuenta() {
+        long idCuenta = 1234;
+
+        cuentaService.eliminarCuenta(idCuenta);
+        verify(cuentaDao, times(1)).delete(idCuenta);
+    }
+
+    @Test
+    void testFind() {
+        long idCuenta = 1234;
+        Cuenta cuenta = new Cuenta();
+
+        when(cuentaDao.find(idCuenta)).thenReturn(cuenta);
+
+        Cuenta cuentaEncontrada = cuentaService.find(idCuenta);
+
+        assertEquals(cuenta, cuentaEncontrada);
+        verify(cuentaDao, times(1)).find(idCuenta);
+    }
+
+    @Test
+    void testGetCuentasByCliente() {
+        long idCliente = 5678;
+        Cuenta cuenta1 = new Cuenta();
+        Cuenta cuenta2 = new Cuenta();
+        List<Cuenta> cuentasEsperadas = Arrays.asList(cuenta1, cuenta2);
+
+        when(cuentaDao.getCuentasByCliente(idCliente)).thenReturn(cuentasEsperadas);
+
+        List<Cuenta> cuentasEncontradas = cuentaService.getCuentasByCliente(idCliente);
+
+        assertEquals(cuentasEsperadas, cuentasEncontradas);
+        verify(cuentaDao, times(1)).getCuentasByCliente(idCliente);
     }
 }

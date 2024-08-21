@@ -4,9 +4,11 @@ import ar.edu.utn.frbb.tup.controller.OperacionRespuesta;
 import ar.edu.utn.frbb.tup.controller.dto.MovimientoDto;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.Cliente;
+import ar.edu.utn.frbb.tup.model.Movimiento;
 import ar.edu.utn.frbb.tup.model.TipoMoneda;
 import ar.edu.utn.frbb.tup.model.exception.CuentaNotExistsException;
 import ar.edu.utn.frbb.tup.model.exception.CuentaWithoutSufficientFundsException;
+import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.TipoMonedaIncompatibleException;
 import ar.edu.utn.frbb.tup.persistence.CuentaDao;
 import ar.edu.utn.frbb.tup.persistence.ClienteDao;
@@ -46,19 +48,151 @@ class TransferenciaServiceTest {
     }
 
     @Test
-    void testHacerTransferencia_Exitosa_MismoBanco() throws CuentaNotExistsException, TipoMonedaIncompatibleException, CuentaWithoutSufficientFundsException {
-        BanelcoService banelcoService = mock(BanelcoService.class);
+    void testHacerTransferencia_CuentaOrigenNotExistsException() throws CuentaNotExistsException, TipoMonedaIncompatibleException, CuentaWithoutSufficientFundsException {
+        long idCuentaOrigen = 123456789;
+        MovimientoDto movimientoDto = new MovimientoDto();
+        movimientoDto.setCuentaOrigen(idCuentaOrigen);
+        movimientoDto.setCuentaDestino(987654321);
+        movimientoDto.setMonto(1000.0);
+        movimientoDto.setMoneda("ARS");
+
+        when(cuentaDao.find(idCuentaOrigen)).thenReturn(null);
+        assertThrows(CuentaNotExistsException.class, () -> transferenciaService.hacerTransferencia(movimientoDto));
+
+        verify(cuentaDao, times(1)).find(idCuentaOrigen);
+        verify(cuentaDao, never()).save(any(Cuenta.class));
+        verify(movimientoDao, never()).save(any(Movimiento.class));
+        verify(clienteDao, never()).save(any(Cliente.class));
+    }
+
+    @Test
+    void testHacerTransferencia_CuentaDestinoNotExistsException() throws CuentaNotExistsException, TipoMonedaIncompatibleException, CuentaWithoutSufficientFundsException {
+        long idCuentaDestino = 987654321;
+        MovimientoDto movimientoDto = new MovimientoDto();
+        movimientoDto.setCuentaOrigen(idCuentaDestino);
+        movimientoDto.setCuentaDestino(123456789);
+        movimientoDto.setMonto(1000.0);
+        movimientoDto.setMoneda("ARS");
+
+        when(cuentaDao.find(idCuentaDestino)).thenReturn(null);
+        assertThrows(CuentaNotExistsException.class, () -> transferenciaService.hacerTransferencia(movimientoDto));
+
+        verify(cuentaDao, times(1)).find(idCuentaDestino);
+        verify(cuentaDao, never()).save(any(Cuenta.class));
+        verify(movimientoDao, never()).save(any(Movimiento.class));
+        verify(clienteDao, never()).save(any(Cliente.class));
+    }
+
+    @Test
+    void testHacerTransferencia_TipoMonedaIncompatibleException_Origen() throws CuentaNotExistsException, TipoMonedaIncompatibleException, CuentaWithoutSufficientFundsException {
         long idCuentaOrigen = 123456789;
         long idCuentaDestino = 987654321;
+        MovimientoDto movimientoDto = new MovimientoDto();
+        movimientoDto.setCuentaOrigen(idCuentaOrigen);
+        movimientoDto.setCuentaDestino(987654321);
+        movimientoDto.setMonto(1000.0);
+        movimientoDto.setMoneda("ARS");
+
+
+        Cuenta cuentaOrigen = new Cuenta();
+        cuentaOrigen.setTitular(idCuentaOrigen);
+        cuentaOrigen.setMoneda(TipoMoneda.DOLARES);
+
+        Cuenta cuentaDestino = new Cuenta();
+        cuentaDestino.setTitular(idCuentaDestino);
+        cuentaDestino.setMoneda(TipoMoneda.PESOS);
+
+
+        when(cuentaDao.find(idCuentaOrigen)).thenReturn(cuentaOrigen);
+        when(cuentaDao.find(idCuentaDestino)).thenReturn(cuentaDestino);
+        assertThrows(TipoMonedaIncompatibleException.class, () -> transferenciaService.hacerTransferencia(movimientoDto));
+
+        verify(cuentaDao, times(2)).find(idCuentaOrigen);
+        verify(cuentaDao, times(2)).find(idCuentaDestino);
+        verify(cuentaDao, never()).save(any(Cuenta.class));
+        verify(movimientoDao, never()).save(any(Movimiento.class));
+        verify(clienteDao, never()).save(any(Cliente.class));
+    }
+
+    @Test
+    void testHacerTransferencia_TipoMonedaIncompatibleException_Destino() throws CuentaNotExistsException, TipoMonedaIncompatibleException, CuentaWithoutSufficientFundsException {
+        long idCuentaOrigen = 123456789;
+        long idCuentaDestino = 987654321;
+        MovimientoDto movimientoDto = new MovimientoDto();
+        movimientoDto.setCuentaOrigen(idCuentaOrigen);
+        movimientoDto.setCuentaDestino(987654321);
+        movimientoDto.setMonto(1000.0);
+        movimientoDto.setMoneda("USD");
+
+
+        Cuenta cuentaOrigen = new Cuenta();
+        cuentaOrigen.setTitular(idCuentaOrigen);
+        cuentaOrigen.setMoneda(TipoMoneda.DOLARES);
+
+        Cuenta cuentaDestino = new Cuenta();
+        cuentaDestino.setTitular(idCuentaDestino);
+        cuentaDestino.setMoneda(TipoMoneda.PESOS);
+
+
+        when(cuentaDao.find(idCuentaOrigen)).thenReturn(cuentaOrigen);
+        when(cuentaDao.find(idCuentaDestino)).thenReturn(cuentaDestino);
+        //doThrow(TipoMonedaIncompatibleException.class).when(transferenciaService).hacerTransferencia(any(MovimientoDto.class));
+        assertThrows(TipoMonedaIncompatibleException.class, () -> transferenciaService.hacerTransferencia(movimientoDto));
+
+        verify(cuentaDao, times(2)).find(idCuentaOrigen);
+        verify(cuentaDao, times(2)).find(idCuentaDestino);
+        verify(cuentaDao, never()).save(any(Cuenta.class));
+        verify(movimientoDao, never()).save(any(Movimiento.class));
+        verify(clienteDao, never()).save(any(Cliente.class));
+    }
+
+    @Test
+    void testHacerTransferencia_CuentaWithoutSufficientFundsException() throws CuentaNotExistsException, TipoMonedaIncompatibleException, CuentaWithoutSufficientFundsException {
+        long idCuentaOrigen = 123456789;
+        long idCuentaDestino = 987654321;
+        MovimientoDto movimientoDto = new MovimientoDto();
+        movimientoDto.setCuentaOrigen(idCuentaOrigen);
+        movimientoDto.setCuentaDestino(987654321);
+        movimientoDto.setMonto(1000.0);
+        movimientoDto.setMoneda("ARS");
+
+        Cuenta cuentaOrigen = new Cuenta();
+        cuentaOrigen.setTitular(idCuentaOrigen);
+        cuentaOrigen.setMoneda(TipoMoneda.PESOS);
+
+        Cuenta cuentaDestino = new Cuenta();
+        cuentaDestino.setTitular(idCuentaDestino);
+        cuentaDestino.setMoneda(TipoMoneda.PESOS);
+
+        when(cuentaDao.find(idCuentaOrigen)).thenReturn(cuentaOrigen);
+        when(cuentaDao.find(idCuentaDestino)).thenReturn(cuentaDestino);
+        assertThrows(CuentaWithoutSufficientFundsException.class, () -> transferenciaService.hacerTransferencia(movimientoDto));
+
+        verify(cuentaDao, times(2)).find(idCuentaOrigen);
+        verify(cuentaDao, times(2)).find(idCuentaDestino);
+        verify(cuentaDao, never()).save(any(Cuenta.class));
+        verify(movimientoDao, never()).save(any(Movimiento.class));
+        verify(clienteDao, never()).save(any(Cliente.class));
+    }
+
+    @Test
+    void testHacerTransferencia_Exitosa_MismoBanco() throws CuentaNotExistsException, TipoMonedaIncompatibleException, CuentaWithoutSufficientFundsException {
+
+        long idCuentaOrigen = 123456789;
+        long idCuentaDestino = 987654321;
+
         Cuenta cuentaOrigen = new Cuenta();
         cuentaOrigen.setMoneda(TipoMoneda.PESOS);
         cuentaOrigen.setBalance(1000.0);
+
         Cuenta cuentaDestino = new Cuenta();
         cuentaDestino.setMoneda(TipoMoneda.PESOS);
+
         Cliente clienteOrigen = new Cliente();
         clienteOrigen.setBanco("BANCO_ORIGEN");
         Cliente clienteDestino = new Cliente();
         clienteDestino.setBanco("BANCO_ORIGEN");
+
         when(cuentaDao.find(idCuentaOrigen)).thenReturn(cuentaOrigen);
         when(cuentaDao.find(idCuentaDestino)).thenReturn(cuentaDestino);
         when(clienteDao.find(cuentaOrigen.getTitular(), true)).thenReturn(clienteOrigen);
@@ -74,8 +208,8 @@ class TransferenciaServiceTest {
 
         assertEquals("EXITOSA", respuesta.getEstado());
         assertEquals("Transferencia exitosa", respuesta.getMensaje());
-        verify(cuentaDao, times(4)).find(idCuentaOrigen);
-        verify(cuentaDao, times(3)).find(idCuentaDestino);
+        verify(cuentaDao, times(2)).find(idCuentaOrigen);
+        verify(cuentaDao, times(2)).find(idCuentaDestino);
         verify(clienteDao, times(2)).find(cuentaOrigen.getTitular(), true);
         verify(clienteDao, times(2)).find(cuentaDestino.getTitular(), true);
         verify(cuentaDao, times(1)).save(cuentaOrigen);
@@ -86,15 +220,19 @@ class TransferenciaServiceTest {
     void testHacerTransferencia_Exitosa_DiferenteBanco() throws CuentaNotExistsException, TipoMonedaIncompatibleException, CuentaWithoutSufficientFundsException {
         long idCuentaOrigen = 123456789;
         long idCuentaDestino = 987654321;
+
         Cuenta cuentaOrigen = new Cuenta();
         cuentaOrigen.setMoneda(TipoMoneda.PESOS);
         cuentaOrigen.setBalance(1000.0);
+
         Cuenta cuentaDestino = new Cuenta();
         cuentaDestino.setMoneda(TipoMoneda.PESOS);
+
         Cliente clienteOrigen = new Cliente();
         clienteOrigen.setBanco("BANCO_ORIGEN");
         Cliente clienteDestino = new Cliente();
         clienteDestino.setBanco("BANCO_DESTINO");
+
         when(cuentaDao.find(idCuentaOrigen)).thenReturn(cuentaOrigen);
         when(cuentaDao.find(idCuentaDestino)).thenReturn(cuentaDestino);
         when(clienteDao.find(cuentaOrigen.getTitular(), true)).thenReturn(clienteOrigen);
@@ -104,14 +242,15 @@ class TransferenciaServiceTest {
         movimientoDto.setCuentaOrigen(idCuentaOrigen);
         movimientoDto.setCuentaDestino(idCuentaDestino);
         movimientoDto.setMoneda("ARS");
-        movimientoDto.setMonto(501.0);
+        movimientoDto.setMonto(500.0);
 
         OperacionRespuesta respuesta = transferenciaService.hacerTransferencia(movimientoDto);
 
+        assertEquals(true,BanelcoService.aprobarTransaccion(movimientoDto.getMonto()));
         assertEquals("EXITOSA", respuesta.getEstado());
         assertEquals("Transferencia exitosa", respuesta.getMensaje());
-        verify(cuentaDao, times(4)).find(idCuentaOrigen);
-        verify(cuentaDao, times(3)).find(idCuentaDestino);
+        verify(cuentaDao, times(2)).find(idCuentaOrigen);
+        verify(cuentaDao, times(2)).find(idCuentaDestino);
         verify(clienteDao, times(2)).find(cuentaOrigen.getTitular(), true);
         verify(clienteDao, times(2)).find(cuentaDestino.getTitular(), true);
         verify(cuentaDao, times(1)).save(cuentaOrigen);
@@ -122,35 +261,39 @@ class TransferenciaServiceTest {
     void testHacerTransferencia_Fallida_DiferenteBanco() throws CuentaNotExistsException, TipoMonedaIncompatibleException, CuentaWithoutSufficientFundsException {
         long idCuentaOrigen = 123456789;
         long idCuentaDestino = 987654321;
+
         Cuenta cuentaOrigen = new Cuenta();
         cuentaOrigen.setMoneda(TipoMoneda.PESOS);
         cuentaOrigen.setBalance(2000.0);
+
         Cuenta cuentaDestino = new Cuenta();
         cuentaDestino.setMoneda(TipoMoneda.PESOS);
+
         Cliente clienteOrigen = new Cliente();
         clienteOrigen.setBanco("BANCO_ORIGEN");
         Cliente clienteDestino = new Cliente();
         clienteDestino.setBanco("BANCO_DESTINO");
+
         when(cuentaDao.find(idCuentaOrigen)).thenReturn(cuentaOrigen);
         when(cuentaDao.find(idCuentaDestino)).thenReturn(cuentaDestino);
         when(clienteDao.find(cuentaOrigen.getTitular(), true)).thenReturn(clienteOrigen);
         when(clienteDao.find(cuentaDestino.getTitular(), true)).thenReturn(clienteDestino);
-        //when(BanelcoService.aprobarTransaccion(anyDouble())).thenReturn(true);
 
         MovimientoDto movimientoDto = new MovimientoDto();
         movimientoDto.setCuentaOrigen(idCuentaOrigen);
         movimientoDto.setCuentaDestino(idCuentaDestino);
         movimientoDto.setMoneda("ARS");
-        movimientoDto.setMonto(1002.0); // Monto superior a 1000 para que la transacción no sea aprobada
+        movimientoDto.setMonto(1002.0);
 
         OperacionRespuesta respuesta = transferenciaService.hacerTransferencia(movimientoDto);
 
-        //assertEquals("FALLIDA", respuesta.getEstado());
+        assertEquals(false,BanelcoService.aprobarTransaccion(movimientoDto.getMonto()));
+        assertEquals("FALLIDA", respuesta.getEstado());
         assertEquals("Transferencia fallida.", respuesta.getMensaje());
-        verify(cuentaDao, times(1)).find(idCuentaOrigen);
-        verify(cuentaDao, times(1)).find(idCuentaDestino);
-        verify(clienteDao, times(1)).find(cuentaOrigen.getTitular(), true);
-        verify(clienteDao, times(1)).find(cuentaDestino.getTitular(), true);
+        verify(cuentaDao, times(2)).find(idCuentaOrigen);
+        verify(cuentaDao, times(2)).find(idCuentaDestino);
+        verify(clienteDao, times(2)).find(cuentaOrigen.getTitular(), true);
+        verify(clienteDao, times(2)).find(cuentaDestino.getTitular(), true);
         verify(cuentaDao, never()).save(any());
         verify(movimientoDao, never()).save(any());
     }
@@ -219,7 +362,7 @@ class TransferenciaServiceTest {
         movimientoDto.setMonto(500.0);
 
         assertThrows(CuentaWithoutSufficientFundsException.class, () -> transferenciaService.hacerTransferencia(movimientoDto));
-        verify(cuentaDao, times(3)).find(idCuentaOrigen);
+        verify(cuentaDao, times(2)).find(idCuentaOrigen);
         verify(cuentaDao, times(2)).find(idCuentaDestino);
         verify(clienteDao, never()).find(anyLong(), anyBoolean());
         verify(cuentaDao, never()).save(any());

@@ -27,34 +27,32 @@ public class TransferenciaService implements TransferenciaServiceInterface {
 
 
     public OperacionRespuesta hacerTransferencia(MovimientoDto movimientoDto) throws CuentaNotExistsException, CuentaWithoutSufficientFundsException, TipoMonedaIncompatibleException {
+        Cuenta cuentaOrigen;
+        Cuenta cuentaDestino;
 
         //Validamos que la cuenta origen exista
         if(cuentaDao.find(movimientoDto.getCuentaOrigen()) == null) {
             throw new CuentaNotExistsException("La cuenta " + movimientoDto.getCuentaOrigen() + " no existe.");
+        } else {
+            cuentaOrigen = cuentaDao.find(movimientoDto.getCuentaOrigen());
         }
         //Validamos que la cuenta destino exista
         if (cuentaDao.find(movimientoDto.getCuentaDestino()) == null) {
             throw new CuentaNotExistsException("La cuenta " + movimientoDto.getCuentaDestino() + " no existe.");
+        } else{
+            cuentaDestino = cuentaDao.find(movimientoDto.getCuentaDestino());
         }
         //Validamos que la cuenta origen opera con la moneda con la que se intenta operar
-        if (!(cuentaDao.find(movimientoDto.getCuentaOrigen()).getMoneda().equals(TipoMoneda.fromString(movimientoDto.getMoneda())))) {
+        if (!(cuentaOrigen.getMoneda().equals(TipoMoneda.fromString(movimientoDto.getMoneda())))) {
             throw new TipoMonedaIncompatibleException("La cuenta " + movimientoDto.getCuentaOrigen() + " no opera con la moneda con la que se intenta operar");
         }
         //Validamos que la cuenta destino opera con la moneda con la que se intenta operar
-        if (!(cuentaDao.find(movimientoDto.getCuentaDestino()).getMoneda().equals(TipoMoneda.fromString(movimientoDto.getMoneda())))) {
+        if (!(cuentaDestino.getMoneda().equals(TipoMoneda.fromString(movimientoDto.getMoneda())))) {
             throw new TipoMonedaIncompatibleException("La cuenta " + movimientoDto.getCuentaDestino() + " no opera con la moneda con la que se intenta operar");
         }
         //Validamos que la cuenta origen tenga fondos suficientes
-        if (movimientoDto.getMonto() > cuentaDao.find(movimientoDto.getCuentaOrigen()).getBalance()) {
+        if (movimientoDto.getMonto() > cuentaOrigen.getBalance()) {
             throw new CuentaWithoutSufficientFundsException("La cuenta " + movimientoDto.getCuentaOrigen() + " no tiene suficiente fondos.");
-        }
-
-        Cuenta cuentaOrigen = cuentaDao.find(movimientoDto.getCuentaOrigen());
-        Cuenta cuentaDestino = cuentaDao.find(movimientoDto.getCuentaDestino());
-
-        //Validamos que la cuenta destino tenga fondos suficientes
-        if (cuentaOrigen.getBalance() < movimientoDto.getMonto()) {
-            return new OperacionRespuesta("ERROR", "La cuenta origen no tiene suficiente saldo para realizar la transferencia.");
         }
 
         Cliente titularOrigen = clienteDao.find(cuentaOrigen.getTitular(), true);
@@ -62,8 +60,8 @@ public class TransferenciaService implements TransferenciaServiceInterface {
 
         // Evaluamos si la transferencia es posible
         // Si la cuenta origen y la cuenta destino pertenecen al mismo banco, la transferencia es posible.
-        // Si la cuenta origen y la cuenta destino pertenecen a bancos diferentes, la transferencia es posible si el monto a transferir no es divisible por 3.
-        if (!titularOrigen.getBanco().equals(titularDestino.getBanco()) && !BanelcoService.aprobarTransaccion(movimientoDto.getMonto())) {
+        // Si la cuenta origen y la cuenta destino pertenecen a bancos diferentes, la transferencia ES POSIBLE si el monto a transferir NO es divisible por 3.
+        if (!(titularOrigen.getBanco().equals(titularDestino.getBanco()) && BanelcoService.aprobarTransaccion(movimientoDto.getMonto()))) {
             return new OperacionRespuesta("FALLIDA", "Transferencia fallida.");
         } else {
             //Realizamos la transferencia y actualizamos las cuentas
