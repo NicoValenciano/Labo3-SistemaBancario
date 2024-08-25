@@ -20,7 +20,7 @@ public class ConsultarSaldoController {
     ConsultarSaldoValidator ConsultarSaldoValidator;
 
     @GetMapping("/{idCuenta}")
-    public OperacionRespuesta consultarSaldo(@PathVariable long idCuenta) throws CuentaNotExistsException {
+    public OperacionRespuesta consultarSaldo(@PathVariable long idCuenta) throws CuentaNotExistsException{
         ConsultarSaldoValidator.validate(idCuenta);
         return ConsultaSaldoService.consultarSaldo(idCuenta);
     }
