@@ -2,10 +2,7 @@ package ar.edu.utn.frbb.tup.service;
 
 import ar.edu.utn.frbb.tup.controller.dto.CuentaDto;
 import ar.edu.utn.frbb.tup.model.*;
-import ar.edu.utn.frbb.tup.model.exception.ClienteAlreadyExistsException;
-import ar.edu.utn.frbb.tup.model.exception.CuentaAlreadyExistsException;
-import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
-import ar.edu.utn.frbb.tup.model.exception.TipoCuentaNotSupportedException;
+import ar.edu.utn.frbb.tup.model.exception.*;
 import ar.edu.utn.frbb.tup.persistence.CuentaDao;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -64,7 +61,7 @@ public class CuentaServiceTest {
     }
     //    2 - cuenta no soportada
     @Test
-    public void testTipoCuentaNoSoportada() throws TipoCuentaAlreadyExistsException {
+    public void testTipoCuentaNoSoportada() throws TipoCuentaAlreadyExistsException, ClienteNotExistsException {
         CuentaDto cuentaDto = new CuentaDto();
         cuentaDto.setMoneda("DOLARES");
         cuentaDto.setTipoCuenta("CUENTA_CORRIENTE");
@@ -75,7 +72,7 @@ public class CuentaServiceTest {
     }
     //    3 - cliente ya tiene cuenta de ese tipo
     @Test
-    public void testClienteTieneCuentaDeEsteTipo() throws TipoCuentaAlreadyExistsException, TipoCuentaNotSupportedException {
+    public void testClienteTieneCuentaDeEsteTipo() throws TipoCuentaAlreadyExistsException, TipoCuentaNotSupportedException, ClienteNotExistsException {
         CuentaDto cuentaDto = new CuentaDto();
         cuentaDto.setMoneda("ARS");
         cuentaDto.setTipoCuenta("CA");
@@ -92,7 +89,7 @@ public class CuentaServiceTest {
     }
     //    4 - cuenta creada exitosamente
     @Test
-    public void testCuentaCreadaExitosamente() throws TipoCuentaAlreadyExistsException, CuentaAlreadyExistsException, ClienteAlreadyExistsException, TipoCuentaNotSupportedException {
+    public void testCuentaCreadaExitosamente() throws TipoCuentaAlreadyExistsException, CuentaAlreadyExistsException, ClienteAlreadyExistsException, TipoCuentaNotSupportedException, ClienteNotExistsException {
         CuentaDto cuentaDto = new CuentaDto();
         cuentaDto.setMoneda("ARS");
         cuentaDto.setTipoCuenta("CA");
@@ -136,7 +133,7 @@ public class CuentaServiceTest {
     }
 
     @Test
-    void testGetCuentasByCliente() {
+    void testGetCuentasByCliente() throws ClienteNotExistsException {
         long idCliente = 5678;
         Cuenta cuenta1 = new Cuenta();
         Cuenta cuenta2 = new Cuenta();

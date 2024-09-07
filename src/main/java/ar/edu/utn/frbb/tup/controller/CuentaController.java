@@ -4,6 +4,7 @@ import ar.edu.utn.frbb.tup.controller.dto.CuentaDto;
 import ar.edu.utn.frbb.tup.controller.validator.CuentaValidator;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.Movimiento;
+import ar.edu.utn.frbb.tup.model.exception.ClienteNotExistsException;
 import ar.edu.utn.frbb.tup.model.exception.CuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaNotSupportedException;
@@ -28,11 +29,11 @@ public class CuentaController {
     private MovimientoService movimientoService;
 
     @PostMapping
-    public Cuenta crearCuenta(@RequestBody CuentaDto cuentaDto) throws TipoCuentaAlreadyExistsException, TipoCuentaNotSupportedException, CuentaAlreadyExistsException {
+    public Cuenta crearCuenta(@RequestBody CuentaDto cuentaDto) throws TipoCuentaAlreadyExistsException, TipoCuentaNotSupportedException, CuentaAlreadyExistsException, ClienteNotExistsException {
         cuentaValidator.validate(cuentaDto);
         try {
             return cuentaService.darDeAltaCuenta(cuentaDto);
-        } catch (TipoCuentaAlreadyExistsException | CuentaAlreadyExistsException | TipoCuentaNotSupportedException e) {
+        } catch (TipoCuentaAlreadyExistsException | CuentaAlreadyExistsException | TipoCuentaNotSupportedException | ClienteNotExistsException e) {
             throw new RuntimeException(e);
         }
     }
@@ -43,7 +44,7 @@ public class CuentaController {
     }
 
     @GetMapping("/cliente/{dni}")
-    public List<Cuenta> getCuentasByClienteDni(@PathVariable long dni) {
+    public List<Cuenta> getCuentasByClienteDni(@PathVariable long dni) throws ClienteNotExistsException {
         return cuentaService.getCuentasByCliente(dni);
     }
 

@@ -4,6 +4,7 @@ import ar.edu.utn.frbb.tup.controller.dto.ClienteDto;
 import ar.edu.utn.frbb.tup.controller.validator.ClienteValidator;
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.exception.ClienteAlreadyExistsException;
+import ar.edu.utn.frbb.tup.model.exception.ClienteNotExistsException;
 import ar.edu.utn.frbb.tup.model.exception.InputErrorException;
 import ar.edu.utn.frbb.tup.service.ClienteService;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,7 +50,7 @@ class ClienteControllerTest {
     }
 
     @Test
-    void testBuscarClientePorDni() {
+    void testBuscarClientePorDni() throws ClienteNotExistsException {
         long dni = 12345678;
         Cliente clienteEsperado = new Cliente();
         clienteEsperado.setDni(dni);
@@ -63,7 +64,7 @@ class ClienteControllerTest {
     }
 
     @Test
-    void testModificarCliente() throws ClienteAlreadyExistsException, InputErrorException {
+    void testModificarCliente() throws ClienteAlreadyExistsException, InputErrorException, ClienteNotExistsException {
         ClienteDto clienteDto = new ClienteDto();
         long dni = 12345678;
         Cliente clienteModificado = new Cliente();
@@ -78,7 +79,7 @@ class ClienteControllerTest {
     }
 
     @Test
-    void testEliminarCliente() {
+    void testEliminarCliente() throws ClienteNotExistsException {
         long dni = 12345678;
 
         clienteController.eliminarCliente(dni);

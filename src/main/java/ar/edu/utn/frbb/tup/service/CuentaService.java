@@ -2,6 +2,7 @@ package ar.edu.utn.frbb.tup.service;
 
 import ar.edu.utn.frbb.tup.controller.dto.CuentaDto;
 import ar.edu.utn.frbb.tup.model.Cuenta;
+import ar.edu.utn.frbb.tup.model.exception.ClienteNotExistsException;
 import ar.edu.utn.frbb.tup.model.exception.CuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaNotSupportedException;
@@ -27,7 +28,7 @@ public class CuentaService implements CuentaServiceInterface {
     //    2 - cuenta no soportada
     //    3 - cliente ya tiene cuenta de ese tipo
     //    4 - cuenta creada exitosamente
-    public Cuenta darDeAltaCuenta(CuentaDto cuentaDto) throws TipoCuentaAlreadyExistsException, CuentaAlreadyExistsException, TipoCuentaNotSupportedException {
+    public Cuenta darDeAltaCuenta(CuentaDto cuentaDto) throws TipoCuentaAlreadyExistsException, CuentaAlreadyExistsException, TipoCuentaNotSupportedException, ClienteNotExistsException {
         Cuenta cuenta = new Cuenta(cuentaDto);
 
         if(cuentaDao.find(cuenta.getNumeroCuenta()) != null) {
@@ -48,7 +49,7 @@ public class CuentaService implements CuentaServiceInterface {
         return cuentaDao.find(id);
     }
 
-    public List<Cuenta> getCuentasByCliente(long dni) {
+    public List<Cuenta> getCuentasByCliente(long dni) throws ClienteNotExistsException {
         clienteService.buscarClientePorDni(dni);
         return cuentaDao.getCuentasByCliente(dni);
     }

@@ -25,6 +25,8 @@ public class TransferenciaService implements TransferenciaServiceInterface {
     @Autowired
     MovimientoDao movimientoDao;
 
+    //Aclaración: se considera que el sistema puede conocer los datos de los clientes, independientemente de que banco sean.
+    //podemos presuponer que el sistema es capaz de obtener los datos de los clientes al consultar la capa de persistencia.
 
     public OperacionRespuesta hacerTransferencia(MovimientoDto movimientoDto) throws CuentaNotExistsException, CuentaWithoutSufficientFundsException, TipoMonedaIncompatibleException {
         Cuenta cuentaOrigen;

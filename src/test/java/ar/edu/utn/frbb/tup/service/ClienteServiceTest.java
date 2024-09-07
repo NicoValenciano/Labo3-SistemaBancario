@@ -4,6 +4,7 @@ package ar.edu.utn.frbb.tup.service;
 import ar.edu.utn.frbb.tup.controller.dto.ClienteDto;
 import ar.edu.utn.frbb.tup.model.*;
 import ar.edu.utn.frbb.tup.model.exception.ClienteAlreadyExistsException;
+import ar.edu.utn.frbb.tup.model.exception.ClienteNotExistsException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.persistence.ClienteDao;
 import org.junit.jupiter.api.BeforeAll;
@@ -71,7 +72,7 @@ public class ClienteServiceTest {
     }
 
     @Test
-    public void testAgregarCuentaAClienteSuccess() throws TipoCuentaAlreadyExistsException {
+    public void testAgregarCuentaAClienteSuccess() throws TipoCuentaAlreadyExistsException, ClienteNotExistsException {
         ClienteDto pepeRino = new ClienteDto();
         pepeRino.setDni(26456439);
         pepeRino.setNombre("Pepe");
@@ -98,7 +99,7 @@ public class ClienteServiceTest {
     }
 
     @Test
-    public void testAgregarCuentaAClienteDuplicada() throws TipoCuentaAlreadyExistsException {
+    public void testAgregarCuentaAClienteDuplicada() throws TipoCuentaAlreadyExistsException, ClienteNotExistsException {
         ClienteDto luciano = new ClienteDto();
         luciano.setDni(26456439);
         luciano.setNombre("Pepe");
@@ -135,7 +136,7 @@ public class ClienteServiceTest {
 
     //1. Agregar una CA$ y CC$ --> success 2 cuentas, titular peperino
     @Test
-    public void testAgregarCuentasAClienteCAyCC() throws TipoCuentaAlreadyExistsException {
+    public void testAgregarCuentasAClienteCAyCC() throws TipoCuentaAlreadyExistsException, ClienteNotExistsException {
         ClienteDto pepeRino = new ClienteDto();
         pepeRino.setDni(26456439);
         pepeRino.setNombre("Pepe");
@@ -168,7 +169,7 @@ public class ClienteServiceTest {
     }
     //2. Agregar una CA$ y CAU$S --> success 2 cuentas, titular peperino...
     @Test
-    public void testAgregarCuentasAClienteCA() throws TipoCuentaAlreadyExistsException {
+    public void testAgregarCuentasAClienteCA() throws TipoCuentaAlreadyExistsException, ClienteNotExistsException {
         ClienteDto pepeRino = new ClienteDto();
         pepeRino.setDni(26456439);
         pepeRino.setNombre("Pepe");
@@ -202,7 +203,7 @@ public class ClienteServiceTest {
     //3. Testear clienteService.buscarPorDni
 
     @Test
-    public void testBuscarClientePorDniPositive() throws IllegalArgumentException {
+    public void testBuscarClientePorDniPositive() throws IllegalArgumentException, ClienteNotExistsException {
         Cliente pepeRino = new Cliente();
         pepeRino.setDni(26456439);
         pepeRino.setNombre("Pepe");
@@ -216,13 +217,13 @@ public class ClienteServiceTest {
     }
 
     @Test
-    public void testBuscarClientePorDniNegative() throws IllegalArgumentException {
+    public void testBuscarClientePorDniNegative() throws ClienteNotExistsException {
         // No mockeo ningún cliente
-        assertThrows(IllegalArgumentException.class, () -> clienteService.buscarClientePorDni(26456439));
+        assertThrows(ClienteNotExistsException.class, () -> clienteService.buscarClientePorDni(26456439));
     }
 
     @Test
-    public void testBuscarClientePorDniNegative2() throws IllegalArgumentException {
+    public void testBuscarClientePorDniNegative2() throws ClienteNotExistsException {
         // Creo un cliente, se busca otro cliente que no existe
         Cliente pepeRino = new Cliente();
         pepeRino.setDni(26456439);
@@ -231,11 +232,11 @@ public class ClienteServiceTest {
         pepeRino.setFechaNacimiento(LocalDate.of(1978, 3, 25));
         pepeRino.setTipoPersona(TipoPersona.PERSONA_FISICA);
 
-        assertThrows(IllegalArgumentException.class, () -> clienteService.buscarClientePorDni(32686279));
+        assertThrows(ClienteNotExistsException.class, () -> clienteService.buscarClientePorDni(32686279));
     }
 
     @Test
-    void testModificarCliente() {
+    void testModificarCliente() throws ClienteNotExistsException {
         long dni = 12345678;
         Cliente clienteExistente = new Cliente();
         clienteExistente.setDni(dni);
@@ -264,7 +265,7 @@ public class ClienteServiceTest {
     }
 
     @Test
-    void testEliminarCliente() {
+    void testEliminarCliente() throws ClienteNotExistsException {
         long dni = 12345678;
         Cliente clienteExistente = new Cliente();
         clienteExistente.setDni(dni);

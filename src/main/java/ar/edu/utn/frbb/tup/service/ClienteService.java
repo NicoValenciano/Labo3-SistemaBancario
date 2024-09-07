@@ -5,6 +5,7 @@ import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.TipoPersona;
 import ar.edu.utn.frbb.tup.model.exception.ClienteAlreadyExistsException;
+import ar.edu.utn.frbb.tup.model.exception.ClienteNotExistsException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.persistence.ClienteDao;
 import ar.edu.utn.frbb.tup.service.serviceInterface.ClienteServiceInterface;
@@ -38,7 +39,7 @@ public class ClienteService implements ClienteServiceInterface {
         return cliente;
     }
 
-    public void agregarCuenta(Cuenta cuenta, long dniTitular) throws TipoCuentaAlreadyExistsException {
+    public void agregarCuenta(Cuenta cuenta, long dniTitular) throws TipoCuentaAlreadyExistsException, ClienteNotExistsException {
         Cliente titular = buscarClientePorDni(dniTitular);
         cuenta.setTitular(dniTitular);
         if (titular.tieneCuenta(cuenta.getTipoCuenta(), cuenta.getMoneda())) {
@@ -48,15 +49,15 @@ public class ClienteService implements ClienteServiceInterface {
         clienteDao.save(titular);
     }
 
-    public Cliente buscarClientePorDni(long dni) {
+    public Cliente buscarClientePorDni(long dni) throws ClienteNotExistsException {
         Cliente cliente = clienteDao.find(dni, true);
         if(cliente == null) {
-            throw new IllegalArgumentException("El cliente no existe");
+            throw new ClienteNotExistsException("El cliente no existe");
         }
         return cliente;
     }
 
-    public Cliente modificarCliente(ClienteDto clienteDto) {
+    public Cliente modificarCliente(ClienteDto clienteDto) throws ClienteNotExistsException {
         Cliente cliente = buscarClientePorDni(clienteDto.getDni());
         cliente.setNombre(clienteDto.getNombre());
         cliente.setApellido(clienteDto.getApellido());
@@ -67,7 +68,7 @@ public class ClienteService implements ClienteServiceInterface {
         return cliente;
     }
 
-    public void eliminarCliente(long dni) {
+    public void eliminarCliente(long dni) throws ClienteNotExistsException {
         Cliente cliente = buscarClientePorDni(dni);
         clienteDao.delete(cliente);
     }

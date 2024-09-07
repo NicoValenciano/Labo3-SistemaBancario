@@ -19,10 +19,6 @@ public class TupResponseEntityExceptionHandler extends ResponseEntityExceptionHa
     protected ResponseEntity<Object> handleBadRequest(
             Exception ex, WebRequest request) {
         String exceptionMessage = ex.getMessage();
-        // Remuevo el nombre de la clase de excepcion del mensaje
-        if (exceptionMessage.contains(":")) {
-            exceptionMessage = exceptionMessage.substring(exceptionMessage.indexOf(":") + 1).trim();
-        }
         CustomApiError error = new CustomApiError();
         error.setErrorCode(1000);
         error.setErrorMessage(exceptionMessage);
@@ -33,14 +29,10 @@ public class TupResponseEntityExceptionHandler extends ResponseEntityExceptionHa
 
 
     @ExceptionHandler(value
-            = {CuentaNotExistsException.class, MovimientoNotExistsException.class})
+            = {CuentaNotExistsException.class, MovimientoNotExistsException.class, ClienteNotExistsException.class})
     protected ResponseEntity<Object> handleMateriaNotFound(
             Exception ex, WebRequest request) {
         String exceptionMessage = ex.getMessage();
-        // Remuevo el nombre de la clase de excepcion del mensaje
-        if (exceptionMessage.contains(":")) {
-            exceptionMessage = exceptionMessage.substring(exceptionMessage.indexOf(":") + 1).trim();
-        }
         CustomApiError error = new CustomApiError();
         error.setErrorCode(3000);
         error.setErrorMessage(exceptionMessage);
@@ -53,10 +45,6 @@ public class TupResponseEntityExceptionHandler extends ResponseEntityExceptionHa
     protected ResponseEntity<Object> handleConflict(
             RuntimeException ex, WebRequest request) {
         String exceptionMessage = ex.getMessage();
-        // Remuevo el nombre de la clase de excepcion del mensaje
-        if (exceptionMessage.contains(":")) {
-            exceptionMessage = exceptionMessage.substring(exceptionMessage.indexOf(":") + 1).trim();
-        }
         CustomApiError error = new CustomApiError();
         error.setErrorCode(5000);
         error.setErrorMessage(exceptionMessage);
@@ -72,7 +60,7 @@ public class TupResponseEntityExceptionHandler extends ResponseEntityExceptionHa
             body = error;
         }
 
-        return new ResponseEntity(body, headers, status);
+        return new ResponseEntity<>(body, headers, status);
     }
 
 }

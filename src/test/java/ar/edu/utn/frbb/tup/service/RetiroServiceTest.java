@@ -50,7 +50,7 @@ class RetiroServiceTest {
 
         assertEquals("EXITOSA", respuesta.getEstado());
         assertEquals("Se retiraron PESOS$ 500.0", respuesta.getMensaje());
-        verify(cuentaDao, times(4)).find(idCuenta);
+        verify(cuentaDao, times(2)).find(idCuenta);
         verify(cuentaDao, times(1)).save(cuenta);
         verify(movimientoDao, times(1)).save(any());
     }
@@ -100,7 +100,7 @@ class RetiroServiceTest {
         movimientoDto.setMonto(1000.0);
 
         assertThrows(CuentaWithoutSufficientFundsException.class, () -> retiroService.hacerRetiro(idCuenta, movimientoDto));
-        verify(cuentaDao, times(3)).find(idCuenta);
+        verify(cuentaDao, times(2)).find(idCuenta);
         verify(cuentaDao, never()).save(any());
         verify(movimientoDao, never()).save(any());
     }

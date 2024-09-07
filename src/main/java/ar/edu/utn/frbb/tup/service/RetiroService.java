@@ -31,17 +31,18 @@ public class RetiroService implements RetiroServiceInterface {
         if(cuentaDao.find(idCuenta) == null) {
             throw new CuentaNotExistsException("La cuenta " + idCuenta + " no existe.");
         }
+        Cuenta cuenta = cuentaDao.find(idCuenta);
         //Validamos que la cuenta opera con la moneda con la que se intenta operar
-        if (!(cuentaDao.find(idCuenta).getMoneda().equals(TipoMoneda.fromString(movimientoDto.getMoneda())))) {
+        if (!(cuenta.getMoneda().equals(TipoMoneda.fromString(movimientoDto.getMoneda())))) {
             throw new TipoMonedaIncompatibleException("La cuenta " + idCuenta + " no opera con la moneda con la que se intenta operar");
         }
         //Validamos que la cuenta tenga fondos suficientes
-        if (movimientoDto.getMonto() > cuentaDao.find(idCuenta).getBalance()) {
+        if (movimientoDto.getMonto() > cuenta.getBalance()) {
             throw new CuentaWithoutSufficientFundsException("La cuenta " + idCuenta + " no tiene suficiente fondos.");
         }
 
         //Se hace el retiro y se actualiza la cuenta
-        Cuenta cuenta = cuentaDao.find(idCuenta);
+
         cuenta.setBalance(cuenta.getBalance() - movimientoDto.getMonto());
         cuentaDao.save(cuenta);
 

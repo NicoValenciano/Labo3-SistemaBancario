@@ -3,6 +3,7 @@ import ar.edu.utn.frbb.tup.controller.dto.CuentaDto;
 import ar.edu.utn.frbb.tup.controller.validator.CuentaValidator;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.Movimiento;
+import ar.edu.utn.frbb.tup.model.exception.ClienteNotExistsException;
 import ar.edu.utn.frbb.tup.model.exception.CuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaNotSupportedException;
@@ -40,7 +41,7 @@ class CuentaControllerTest {
     }
 
     @Test
-    void testCrearCuenta() throws TipoCuentaAlreadyExistsException, CuentaAlreadyExistsException, TipoCuentaNotSupportedException {
+    void testCrearCuenta() throws TipoCuentaAlreadyExistsException, CuentaAlreadyExistsException, TipoCuentaNotSupportedException, ClienteNotExistsException {
         CuentaDto cuentaDto = new CuentaDto();
         Cuenta cuentaCreada = new Cuenta();
 
@@ -68,7 +69,7 @@ class CuentaControllerTest {
     }
 
     @Test
-    void testGetCuentasByClienteDni() {
+    void testGetCuentasByClienteDni() throws ClienteNotExistsException {
         long dni = 12345678;
         List<Cuenta> cuentasEsperadas = Arrays.asList(new Cuenta(), new Cuenta());
 
