@@ -21,7 +21,7 @@ public class ClienteController {
 
 
     @PostMapping
-    public Cliente crearCliente(@RequestBody ClienteDto clienteDto) throws ClienteAlreadyExistsException, InputErrorException {
+    public Cliente crearCliente(@RequestBody ClienteDto clienteDto) throws InputErrorException, ClienteAlreadyExistsException {
         clienteValidator.validate(clienteDto);
         return clienteService.darDeAltaCliente(clienteDto);
     }
@@ -32,9 +32,9 @@ public class ClienteController {
     }
 
    @PutMapping("/{dni}")
-    public Cliente modificarCliente(@RequestBody ClienteDto clienteDto, @PathVariable long dni) throws ClienteAlreadyExistsException, InputErrorException {
+    public Cliente modificarCliente(@RequestBody ClienteDto clienteDto) throws ClienteAlreadyExistsException, InputErrorException {
         clienteValidator.validate(clienteDto);
-        return clienteService.modificarCliente(clienteDto, dni);
+        return clienteService.modificarCliente(clienteDto);
     }
 
     @DeleteMapping("/{dni}")

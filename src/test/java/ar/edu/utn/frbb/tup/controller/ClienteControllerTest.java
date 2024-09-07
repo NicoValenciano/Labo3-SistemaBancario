@@ -1,6 +1,5 @@
 package ar.edu.utn.frbb.tup.controller;
 
-import ar.edu.utn.frbb.tup.controller.ClienteController;
 import ar.edu.utn.frbb.tup.controller.dto.ClienteDto;
 import ar.edu.utn.frbb.tup.controller.validator.ClienteValidator;
 import ar.edu.utn.frbb.tup.model.Cliente;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -70,13 +68,13 @@ class ClienteControllerTest {
         long dni = 12345678;
         Cliente clienteModificado = new Cliente();
 
-        when(clienteService.modificarCliente(clienteDto, dni)).thenReturn(clienteModificado);
+        when(clienteService.modificarCliente(clienteDto)).thenReturn(clienteModificado);
 
-        Cliente resultado = clienteController.modificarCliente(clienteDto, dni);
+        Cliente resultado = clienteController.modificarCliente(clienteDto);
 
         assertEquals(clienteModificado, resultado);
         verify(clienteValidator, times(1)).validate(clienteDto);
-        verify(clienteService, times(1)).modificarCliente(clienteDto, dni);
+        verify(clienteService, times(1)).modificarCliente(clienteDto);
     }
 
     @Test

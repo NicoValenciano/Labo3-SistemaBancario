@@ -27,9 +27,6 @@ public class ClienteServiceTest {
     @Mock
     private ClienteDao clienteDao;
 
-    @Mock
-    private ClienteDto clienteDto;
-
     @InjectMocks
     private ClienteService clienteService;
 
@@ -248,6 +245,7 @@ public class ClienteServiceTest {
         clienteExistente.setTipoPersona(TipoPersona.PERSONA_FISICA);
 
         ClienteDto clienteDto = new ClienteDto();
+        clienteDto.setDni(dni);
         clienteDto.setNombre("Juan Modificado");
         clienteDto.setApellido("Pérez Modificado");
         clienteDto.setFechaNacimiento("1995-10-20");
@@ -255,7 +253,7 @@ public class ClienteServiceTest {
 
         when(clienteDao.find(dni, true)).thenReturn(clienteExistente);
 
-        Cliente clienteModificado = clienteService.modificarCliente(clienteDto, dni);
+        Cliente clienteModificado = clienteService.modificarCliente(clienteDto);
 
         assertEquals("Juan Modificado", clienteModificado.getNombre());
         assertEquals("Pérez Modificado", clienteModificado.getApellido());

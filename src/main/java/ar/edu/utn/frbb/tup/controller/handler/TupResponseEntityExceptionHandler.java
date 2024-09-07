@@ -15,10 +15,14 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class TupResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value
-            = {IllegalArgumentException.class, TipoCuentaAlreadyExistsException.class, ClienteAlreadyExistsException.class, CuentaAlreadyExistsException.class, InputErrorException.class})
+            = {TipoCuentaAlreadyExistsException.class, IllegalArgumentException.class, ClienteAlreadyExistsException.class, CuentaAlreadyExistsException.class, InputErrorException.class})
     protected ResponseEntity<Object> handleBadRequest(
             Exception ex, WebRequest request) {
         String exceptionMessage = ex.getMessage();
+        // Remuevo el nombre de la clase de excepcion del mensaje
+        if (exceptionMessage.contains(":")) {
+            exceptionMessage = exceptionMessage.substring(exceptionMessage.indexOf(":") + 1).trim();
+        }
         CustomApiError error = new CustomApiError();
         error.setErrorCode(1000);
         error.setErrorMessage(exceptionMessage);
@@ -26,11 +30,17 @@ public class TupResponseEntityExceptionHandler extends ResponseEntityExceptionHa
                 new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
+
+
     @ExceptionHandler(value
             = {CuentaNotExistsException.class, MovimientoNotExistsException.class})
     protected ResponseEntity<Object> handleMateriaNotFound(
             Exception ex, WebRequest request) {
         String exceptionMessage = ex.getMessage();
+        // Remuevo el nombre de la clase de excepcion del mensaje
+        if (exceptionMessage.contains(":")) {
+            exceptionMessage = exceptionMessage.substring(exceptionMessage.indexOf(":") + 1).trim();
+        }
         CustomApiError error = new CustomApiError();
         error.setErrorCode(3000);
         error.setErrorMessage(exceptionMessage);
@@ -43,6 +53,10 @@ public class TupResponseEntityExceptionHandler extends ResponseEntityExceptionHa
     protected ResponseEntity<Object> handleConflict(
             RuntimeException ex, WebRequest request) {
         String exceptionMessage = ex.getMessage();
+        // Remuevo el nombre de la clase de excepcion del mensaje
+        if (exceptionMessage.contains(":")) {
+            exceptionMessage = exceptionMessage.substring(exceptionMessage.indexOf(":") + 1).trim();
+        }
         CustomApiError error = new CustomApiError();
         error.setErrorCode(5000);
         error.setErrorMessage(exceptionMessage);

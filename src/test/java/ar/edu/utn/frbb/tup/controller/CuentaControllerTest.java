@@ -1,6 +1,4 @@
 package ar.edu.utn.frbb.tup.controller;
-import ar.edu.utn.frbb.tup.controller.CuentaController;
-import ar.edu.utn.frbb.tup.controller.HistoricoRespuesta;
 import ar.edu.utn.frbb.tup.controller.dto.CuentaDto;
 import ar.edu.utn.frbb.tup.controller.validator.CuentaValidator;
 import ar.edu.utn.frbb.tup.model.Cuenta;

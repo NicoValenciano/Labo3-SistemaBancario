@@ -56,8 +56,8 @@ public class ClienteService implements ClienteServiceInterface {
         return cliente;
     }
 
-    public Cliente modificarCliente(ClienteDto clienteDto, long dni) {
-        Cliente cliente = buscarClientePorDni(dni);
+    public Cliente modificarCliente(ClienteDto clienteDto) {
+        Cliente cliente = buscarClientePorDni(clienteDto.getDni());
         cliente.setNombre(clienteDto.getNombre());
         cliente.setApellido(clienteDto.getApellido());
         cliente.setDni(clienteDto.getDni());
