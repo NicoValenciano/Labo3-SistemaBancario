@@ -62,9 +62,13 @@ public class TransferenciaService implements TransferenciaServiceInterface {
 
         // Evaluamos si la transferencia es posible
         // Si la cuenta origen y la cuenta destino pertenecen al mismo banco, la transferencia es posible.
-        // Si la cuenta origen y la cuenta destino pertenecen a bancos diferentes, la transferencia ES POSIBLE si el monto a transferir NO es divisible por 3.
-        if (!(titularOrigen.getBanco().equals(titularDestino.getBanco()) && BanelcoService.aprobarTransaccion(movimientoDto.getMonto()))) {
-            return new OperacionRespuesta("FALLIDA", "Transferencia fallida.");
+
+        if (!titularOrigen.getBanco().equals(titularDestino.getBanco())) {
+            // Si los bancos son diferentes, validar la aprobación de la transacción.
+            // La transferencia ES POSIBLE si el monto a transferir NO es divisible por 3.
+            if (!BanelcoService.aprobarTransaccion(movimientoDto.getMonto())) {
+                return new OperacionRespuesta("FALLIDA", "Transferencia fallida.");
+            }
         } else {
             //Realizamos la transferencia y actualizamos las cuentas
             cuentaOrigen.setBalance(cuentaOrigen.getBalance() - movimientoDto.getMonto());
@@ -87,8 +91,7 @@ public class TransferenciaService implements TransferenciaServiceInterface {
             movimientoDestino.setTipo(TipoMovimiento.CREDITO);
             movimientoDestino.setDescripcionBreve("Transferencia entrante");
             movimientoDao.save(movimientoDestino);
-
-            return new OperacionRespuesta("EXITOSA", "Transferencia exitosa");
         }
+        return new OperacionRespuesta("EXITOSA", "Transferencia exitosa");
     }
 }
