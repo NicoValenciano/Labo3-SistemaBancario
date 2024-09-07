@@ -26,9 +26,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CuentaController.class)
@@ -50,7 +52,7 @@ public class CuentaControllerWebMvcTest {
     private MovimientoService movimientoService;
 
     @Test
-    void testCrearCuenta() throws TipoCuentaNotSupportedException, Exception, CuentaAlreadyExistsException {
+    void testCrearCuenta() throws  Exception {
         CuentaDto cuentaDto = new CuentaDto();
         Cuenta cuentaCreada = new Cuenta();
 
@@ -60,6 +62,38 @@ public class CuentaControllerWebMvcTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(cuentaDto)))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void testCrearCuentaConTipoCuentaNoSoportado() throws Exception {
+        CuentaDto cuentaDto = new CuentaDto();
+        cuentaDto.setTipoCuenta("CUENTA_NO_SOPORTADA");
+
+        when(cuentaService.darDeAltaCuenta(any(CuentaDto.class)))
+                .thenThrow(new TipoCuentaNotSupportedException("Tipo de cuenta no soportado"));
+
+        mockMvc.perform(post("/api/cuenta")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(cuentaDto)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.errorCode").value(5002))
+                .andExpect(jsonPath("$.errorMessage").value("Tipo de cuenta no soportado"));
+    }
+
+    @Test
+    void testCrearCuentaYaExistente() throws Exception {
+        CuentaDto cuentaDto = new CuentaDto();
+        cuentaDto.setTipoCuenta(String.valueOf(TipoCuenta.CAJA_AHORRO));
+
+        when(cuentaService.darDeAltaCuenta(any(CuentaDto.class)))
+                .thenThrow(new CuentaAlreadyExistsException("La cuenta ya existe"));
+
+        mockMvc.perform(post("/api/cuenta")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(cuentaDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value(1003))
+                .andExpect(jsonPath("$.errorMessage").value("La cuenta ya existe"));
     }
 
     @Test

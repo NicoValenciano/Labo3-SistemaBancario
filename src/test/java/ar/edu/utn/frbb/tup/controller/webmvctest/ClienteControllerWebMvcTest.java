@@ -5,6 +5,7 @@ import ar.edu.utn.frbb.tup.controller.dto.ClienteDto;
 import ar.edu.utn.frbb.tup.controller.validator.ClienteValidator;
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.exception.ClienteAlreadyExistsException;
+import ar.edu.utn.frbb.tup.model.exception.CuentaNotExistsException;
 import ar.edu.utn.frbb.tup.service.ClienteService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -14,13 +15,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDate;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @WebMvcTest(ClienteController.class)
 class ClienteControllerWebMvcTest {
@@ -38,7 +42,7 @@ class ClienteControllerWebMvcTest {
     private ClienteService clienteService;
 
     @Test
-    void testCrearCliente() throws Exception, ClienteAlreadyExistsException {
+    void testCrearCliente() throws Exception {
         ClienteDto clienteDto = new ClienteDto();
         Cliente clienteCreado = new Cliente();
 
@@ -48,6 +52,26 @@ class ClienteControllerWebMvcTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(clienteDto)))
                 .andExpect(status().isOk());
+    }
+    @Test
+    void testCrearClienteConDniExistente() throws Exception {
+        ClienteDto clienteDto = new ClienteDto();
+        clienteDto.setDni(12345678);
+        clienteDto.setNombre("Juan");
+        clienteDto.setApellido("Perez");
+        clienteDto.setFechaNacimiento(String.valueOf(LocalDate.parse("1980-11-12")));
+
+        when(clienteService.darDeAltaCliente(any(ClienteDto.class)))
+                .thenThrow(new ClienteAlreadyExistsException("Cliente con DNI 12345678 ya existe"));
+
+        mockMvc.perform(post("/api/cliente")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(clienteDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errorCode").value(1001))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.errorMessage").value("Cliente con DNI 12345678 ya existe"));
+
+        verify(clienteService, times(1)).darDeAltaCliente(any(ClienteDto.class));
     }
 
     @Test

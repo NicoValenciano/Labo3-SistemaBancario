@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(MovimientoController.class)
@@ -48,6 +49,20 @@ public class MovimientoControllerWebMvcTest {
                         .content(objectMapper.writeValueAsString(movimientoEsperado)))
                 .andExpect(status().isOk());
 
+    }
+
+    @Test
+    void testGetMovimientoByIdNotExists() throws Exception {
+        long id = 999999999;
+
+        when(movimientoService.find(id))
+                .thenThrow(new MovimientoNotExistsException("Movimiento con ID " + id + " no existe"));
+
+        mockMvc.perform(get("/movimiento/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.errorCode").value(3003))
+                .andExpect(jsonPath("$.errorMessage").value("Movimiento con ID " + id + " no existe"));
     }
 
 }

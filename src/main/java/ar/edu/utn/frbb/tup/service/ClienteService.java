@@ -63,7 +63,7 @@ public class ClienteService implements ClienteServiceInterface {
         cliente.setApellido(clienteDto.getApellido());
         cliente.setDni(clienteDto.getDni());
         cliente.setFechaNacimiento(LocalDate.parse(clienteDto.getFechaNacimiento()));
-        cliente.setTipoPersona(TipoPersona.valueOf(clienteDto.getTipoPersona()));
+        cliente.setTipoPersona(TipoPersona.fromString(clienteDto.getTipoPersona()));
         clienteDao.save(cliente);
         return cliente;
     }

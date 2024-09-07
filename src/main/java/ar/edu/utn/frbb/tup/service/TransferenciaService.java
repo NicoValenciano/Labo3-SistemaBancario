@@ -25,6 +25,9 @@ public class TransferenciaService implements TransferenciaServiceInterface {
     @Autowired
     MovimientoDao movimientoDao;
 
+    @Autowired
+    BanelcoService banelcoService;
+
     //Aclaración: se considera que el sistema puede conocer los datos de los clientes, independientemente de que banco sean.
     //podemos presuponer que el sistema es capaz de obtener los datos de los clientes al consultar la capa de persistencia.
 
@@ -66,32 +69,34 @@ public class TransferenciaService implements TransferenciaServiceInterface {
         if (!titularOrigen.getBanco().equals(titularDestino.getBanco())) {
             // Si los bancos son diferentes, validar la aprobación de la transacción.
             // La transferencia ES POSIBLE si el monto a transferir NO es divisible por 3.
-            if (!BanelcoService.aprobarTransaccion(movimientoDto.getMonto())) {
+            if (!banelcoService.aprobarTransaccion(movimientoDto.getMonto())) {
                 return new OperacionRespuesta("FALLIDA", "Transferencia fallida.");
             }
-        } else {
-            //Realizamos la transferencia y actualizamos las cuentas
-            cuentaOrigen.setBalance(cuentaOrigen.getBalance() - movimientoDto.getMonto());
-            cuentaDao.save(cuentaOrigen);
-            cuentaDestino.setBalance(cuentaDestino.getBalance() + movimientoDto.getMonto());
-            cuentaDao.save(cuentaDestino);
-
-            //Creamos el movimiento de la cuenta origen
-            Movimiento movimientoOrigen = new Movimiento(movimientoDto);
-            movimientoOrigen.setNumeroCuenta(movimientoDto.getCuentaOrigen());
-            movimientoOrigen.setMonto(movimientoDto.getMonto());
-            movimientoOrigen.setTipo(TipoMovimiento.DEBITO);
-            movimientoOrigen.setDescripcionBreve("Transferencia saliente");
-            movimientoDao.save(movimientoOrigen);
-
-            //Creamos el movimiento de la cuenta destino
-            Movimiento movimientoDestino = new Movimiento(movimientoDto);
-            movimientoDestino.setNumeroCuenta(movimientoDto.getCuentaDestino());
-            movimientoDestino.setMonto(movimientoDto.getMonto());
-            movimientoDestino.setTipo(TipoMovimiento.CREDITO);
-            movimientoDestino.setDescripcionBreve("Transferencia entrante");
-            movimientoDao.save(movimientoDestino);
         }
+
+        //Realizamos la transferencia y actualizamos las cuentas
+        cuentaOrigen.setBalance(cuentaOrigen.getBalance() - movimientoDto.getMonto());
+        cuentaDao.save(cuentaOrigen);
+        cuentaDestino.setBalance(cuentaDestino.getBalance() + movimientoDto.getMonto());
+        cuentaDao.save(cuentaDestino);
+
+        //Creamos el movimiento de la cuenta origen
+        Movimiento movimientoOrigen = new Movimiento(movimientoDto);
+        movimientoOrigen.setNumeroCuenta(movimientoDto.getCuentaOrigen());
+        movimientoOrigen.setMonto(movimientoDto.getMonto());
+        movimientoOrigen.setTipo(TipoMovimiento.DEBITO);
+        movimientoOrigen.setDescripcionBreve("Transferencia saliente");
+        movimientoDao.save(movimientoOrigen);
+
+        //Creamos el movimiento de la cuenta destino
+        Movimiento movimientoDestino = new Movimiento(movimientoDto);
+        movimientoDestino.setNumeroCuenta(movimientoDto.getCuentaDestino());
+        movimientoDestino.setMonto(movimientoDto.getMonto());
+        movimientoDestino.setTipo(TipoMovimiento.CREDITO);
+        movimientoDestino.setDescripcionBreve("Transferencia entrante");
+        movimientoDao.save(movimientoDestino);
+
         return new OperacionRespuesta("EXITOSA", "Transferencia exitosa");
     }
+
 }
