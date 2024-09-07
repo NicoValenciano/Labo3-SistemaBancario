@@ -39,7 +39,7 @@ public class RetirarControllerWebMvcTest {
     private RetiroService retiroService;
 
     @Test
-    void testRetirar() throws Exception, CuentaNotExistsException, TipoMonedaIncompatibleException {
+    void testRetirar() throws Exception, CuentaNotExistsException, TipoMonedaIncompatibleException, CuentaWithoutSufficientFundsException {
         long idCuenta = 123456789;
         Cuenta cuenta = new Cuenta();
         cuenta.setBalance(1000.0);
